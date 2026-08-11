@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#4f46e5">
+
+    <meta name="description"
+          content="AI Robo Teacher - Smart Virtual Teacher and Quiz App">
+
+    <title>AI Robo Teacher</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="app-header">
+
+        <div class="robot-logo">
+            🤖
+        </div>
+
+        <div class="header-text">
+            <h1>AI Robo Teacher</h1>
+            <p>তোমার স্মার্ট Virtual Teacher</p>
+        </div>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="container">
+
+        <!-- Welcome Card -->
+
+        <section class="welcome-card">
+
+            <div class="robot">
+                🤖
+            </div>
+
+            <div>
+                <h2>আসসালামু আলাইকুম! 👋</h2>
+
+                <p>
+                    আমি তোমার AI Robo Teacher।
+                    তুমি প্রশ্ন করো, আমি বুঝিয়ে দেব।
+                    চাইলে বড় Quiz-ও দিতে পারবে!
+                </p>
+            </div>
+
+        </section>
+
+
+        <!-- ================= SUBJECT ================= -->
+
+        <section class="card">
+
+            <h2>📚 Subject নির্বাচন করো</h2>
+
+            <select id="subjectSelect">
+
+                <option value="bangla">
+                    বাংলা
+                </option>
+
+                <option value="english">
+                    ইংরেজি
+                </option>
+
+                <option value="math">
+                    গণিত
+                </option>
+
+                <option value="science">
+                    বিজ্ঞান
+                </option>
+
+                <option value="ict">
+                    ICT
+                </option>
+
+                <option value="bgs">
+                    বাংলাদেশ ও বিশ্বপরিচয়
+                </option>
+
+            </select>
+
+        </section>
+
+
+        <!-- ================= QUIZ SETTINGS ================= -->
+
+        <section class="card">
+
+            <h2>🎯 Quiz নির্বাচন করো</h2>
+
+            <p>
+                তুমি কতটি প্রশ্নের Quiz দিতে চাও?
+            </p>
+
+            <div class="quiz-buttons">
+
+                <button onclick="startQuiz(10)">
+                    ১০ প্রশ্ন
+                </button>
+
+                <button onclick="startQuiz(20)">
+                    ২০ প্রশ্ন
+                </button>
+
+                <button onclick="startQuiz(30)">
+                    ৩০ প্রশ্ন
+                </button>
+
+                <button onclick="startQuiz(50)">
+                    ৫০ প্রশ্ন
+                </button>
+
+                <button onclick="startQuiz(80)">
+                    ৮০ প্রশ্ন
+                </button>
+
+                <button onclick="startQuiz(100)">
+                    ১০০ প্রশ্ন
+                </button>
+
+                <button class="big-quiz"
+                        onclick="startQuiz(120)">
+                    🏆 ১২০ প্রশ্নের Mega Quiz
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= QUIZ AREA ================= -->
+
+        <section id="quizArea"
+                 class="card quiz-area"
+                 style="display:none;">
+
+            <div class="quiz-top">
+
+                <span id="questionNumber">
+                    প্রশ্ন ১ / ১২০
+                </span>
+
+                <span id="scoreDisplay">
+                    Score: 0
+                </span>
+
+            </div>
+
+
+            <div class="progress-container">
+
+                <div id="progressBar"
+                     class="progress-bar">
+                </div>
+
+            </div>
+
+
+            <h2 id="question">
+                প্রশ্ন এখানে আসবে
+            </h2>
+
+
+            <div id="options"
+                 class="options">
+            </div>
+
+
+            <div id="explanation"
+                 class="explanation"
+                 style="display:none;">
+
+                <h3>💡 Explanation</h3>
+
+                <p id="explanationText"></p>
+
+            </div>
+
+
+            <button id="nextButton"
+                    onclick="nextQuestion()"
+                    style="display:none;">
+
+                ➡️ পরের প্রশ্ন
+
+            </button>
+
+        </section>
+
+
+        <!-- ================= RESULT ================= -->
+
+        <section id="resultArea"
+                 class="card result-area"
+                 style="display:none;">
+
+            <div class="result-icon">
+                🏆
+            </div>
+
+            <h2>Quiz শেষ! 🎉</h2>
+
+            <p id="resultText">
+                তোমার ফলাফল এখানে দেখাবে।
+            </p>
+
+            <div class="result-box">
+
+                <div>
+                    <strong id="correctCount">
+                        0
+                    </strong>
+
+                    <span>
+                        সঠিক
+                    </span>
+                </div>
+
+                <div>
+                    <strong id="wrongCount">
+                        0
+                    </strong>
+
+                    <span>
+                        ভুল
+                    </span>
+                </div>
+
+                <div>
+                    <strong id="percentage">
+                        0%
+                    </strong>
+
+                    <span>
+                        Percentage
+                    </span>
+                </div>
+
+            </div>
+
+
+            <button onclick="restartQuiz()">
+                🔄 আবার Quiz দাও
+            </button>
+
+        </section>
+
+
+        <!-- ================= AI TEACHER ================= -->
+
+        <section class="card teacher-card">
+
+            <h2>🤖 AI Teacher</h2>
+
+            <p>
+                কোনো বিষয় বুঝতে সমস্যা হলে নিচে প্রশ্ন লিখো।
+            </p>
+
+            <textarea
+                id="studentQuestion"
+                placeholder="যেমন: আলোর প্রতিফলন কী?">
+            </textarea>
+
+
+            <div class="teacher-buttons">
+
+                <button onclick="askTeacher()">
+                    🤖 AI Explanation
+                </button>
+
+                <button onclick="speakTeacherAnswer()">
+                    🔊 শুনুন
+                </button>
+
+            </div>
+
+
+            <div id="teacherAnswer"
+                 class="teacher-answer"
+                 style="display:none;">
+
+                <h3>👨‍🏫 Robo Teacher বলছে:</h3>
+
+                <p id="teacherAnswerText"></p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= FEATURES ================= -->
+
+        <section class="card">
+
+            <h2>✨ Features</h2>
+
+            <div class="features">
+
+                <div class="feature">
+                    📚
+                    <span>৬টি Subject</span>
+                </div>
+
+                <div class="feature">
+                    📝
+                    <span>৭২০+ Quiz Question</span>
+                </div>
+
+                <div class="feature">
+                    🎯
+                    <span>Easy + Medium + Hard</span>
+                </div>
+
+                <div class="feature">
+                    🤖
+                    <span>Virtual Teacher</span>
+                </div>
+
+                <div class="feature">
+                    🔊
+                    <span>বাংলা Voice</span>
+                </div>
+
+                <div class="feature">
+                    🏆
+                    <span>Mega Quiz</span>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <p>
+            🤖 AI Robo Teacher
+        </p>
+
+        <p>
+            Made for Smart Learning 🚀
+        </p>
+
+    </footer>
+
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+
+</body>
+  </html>

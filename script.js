@@ -1,213 +1,570 @@
-// ===============================
-// AI SCHOOL QUIZ - script.js
-// ===============================
+// ========================================
+// AI ROBO TEACHER - FINAL SCRIPT
+// ========================================
 
 let currentQuestions = [];
 let currentIndex = 0;
 let score = 0;
-let selectedSubject = "";
+let wrong = 0;
 let totalQuestions = 10;
+let selectedSubject = "";
 
-// সব Subject
-const subjects = {
-  bangla: typeof banglaQuestions !== "undefined" ? banglaQuestions : [],
-  english: typeof englishQuestions !== "undefined" ? englishQuestions : [],
-  math: typeof mathQuestions !== "undefined" ? mathQuestions : [],
-  science: typeof scienceQuestions !== "undefined" ? scienceQuestions : [],
-  ict: typeof ictQuestions !== "undefined" ? ictQuestions : [],
-  bgs: typeof bgsQuestions !== "undefined" ? bgsQuestions : []
-};
+// ----------------------------------------
+// Subject অনুযায়ী প্রশ্ন নেওয়া
+// ----------------------------------------
+function getQuestions(subject) {
 
-// Quiz শুরু
-function startQuiz(subject, amount) {
+    subject = String(subject).toLowerCase().trim();
 
-  selectedSubject = subject;
-  totalQuestions = Number(amount);
+    if (subject === "bangla") {
+        return typeof banglaQuestions !== "undefined"
+            ? banglaQuestions
+            : [];
+    }
 
-  if (!subjects[subject] || subjects[subject].length === 0) {
-    alert("এই বিষয়ের প্রশ্ন পাওয়া যায়নি।");
-    return;
-  }
+    if (subject === "english") {
+        return typeof englishQuestions !== "undefined"
+            ? englishQuestions
+            : [];
+    }
 
-  // যত প্রশ্ন আছে, তার বেশি নেওয়া হবে না
-  totalQuestions = Math.min(totalQuestions, subjects[subject].length);
+    if (subject === "math") {
+        return typeof mathQuestions !== "undefined"
+            ? mathQuestions
+            : [];
+    }
 
-  // প্রশ্ন এলোমেলো করা
-  currentQuestions = [...subjects[subject]]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, totalQuestions);
+    if (subject === "science") {
+        return typeof scienceQuestions !== "undefined"
+            ? scienceQuestions
+            : [];
+    }
 
-  currentIndex = 0;
-  score = 0;
+    if (subject === "ict") {
+        return typeof ictQuestions !== "undefined"
+            ? ictQuestions
+            : [];
+    }
 
-  showQuestion();
+    if (subject === "bgs") {
+        return typeof bgsQuestions !== "undefined"
+            ? bgsQuestions
+            : [];
+    }
+
+    return [];
 }
 
+
+// ----------------------------------------
+// Quiz শুরু
+// ----------------------------------------
+function startQuiz(amount) {
+
+    const subjectBox = document.getElementById("subjectSelect");
+
+    if (!subjectBox) {
+        alert("Subject নির্বাচন করার জায়গা পাওয়া যায়নি।");
+        return;
+    }
+
+    selectedSubject = subjectBox.value;
+
+    totalQuestions = Number(amount);
+
+    let questions = getQuestions(selectedSubject);
+
+    if (!questions || questions.length === 0) {
+
+        alert(
+            "এই বিষয়ের প্রশ্ন পাওয়া যায়নি।\n\n" +
+            "Subject: " + selectedSubject
+        );
+
+        return;
+    }
+
+    // সর্বোচ্চ যত প্রশ্ন আছে
+    totalQuestions = Math.min(
+        totalQuestions,
+        questions.length
+    );
+
+    // প্রশ্ন এলোমেলো
+    currentQuestions = [...questions]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, totalQuestions);
+
+    currentIndex = 0;
+    score = 0;
+    wrong = 0;
+
+    // Quiz area দেখানো
+    const quizArea = document.getElementById("quizArea");
+
+    if (quizArea) {
+        quizArea.style.display = "block";
+    }
+
+    showQuestion();
+}
+
+
+// ----------------------------------------
 // প্রশ্ন দেখানো
+// ----------------------------------------
 function showQuestion() {
 
-  const question = currentQuestions[currentIndex];
+    if (
+        !currentQuestions ||
+        currentIndex >= currentQuestions.length
+    ) {
+        finishQuiz();
+        return;
+    }
 
-  if (!question) {
-    finishQuiz();
-    return;
-  }
+    const q = currentQuestions[currentIndex];
 
-  const questionBox =
-    document.getElementById("question") ||
-    document.getElementById("questionText");
+    const questionBox =
+        document.getElementById("question");
 
-  const optionsBox =
-    document.getElementById("options") ||
-    document.getElementById("optionsContainer");
+    const optionsBox =
+        document.getElementById("options");
 
-  const progress =
-    document.getElementById("progress");
+    const questionNumber =
+        document.getElementById("questionNumber");
 
-  if (questionBox) {
-    questionBox.innerText =
-      (currentIndex + 1) + ". " + question.question;
-  }
+    const progressBar =
+        document.getElementById("progressBar");
 
-  if (optionsBox) {
+    const explanation =
+        document.getElementById("explanation");
 
-    optionsBox.innerHTML = "";
+    const explanationText =
+        document.getElementById("explanationText");
 
-    question.options.forEach((option, index) => {
+    const nextButton =
+        document.getElementById("nextButton");
 
-      const button = document.createElement("button");
 
-      button.className = "option-btn";
-      button.innerText = option;
+    // প্রশ্ন
+    if (questionBox) {
 
-      button.onclick = function () {
-        checkAnswer(index);
-      };
+        questionBox.innerText =
+            q.question;
+    }
 
-      optionsBox.appendChild(button);
-    });
-  }
 
-  if (progress) {
-    progress.innerText =
-      "প্রশ্ন " +
-      (currentIndex + 1) +
-      " / " +
-      totalQuestions;
-  }
+    // প্রশ্ন নম্বর
+    if (questionNumber) {
+
+        questionNumber.innerText =
+            "প্রশ্ন " +
+            (currentIndex + 1) +
+            " / " +
+            totalQuestions;
+    }
+
+
+    // Progress bar
+    if (progressBar) {
+
+        const percent =
+            ((currentIndex) / totalQuestions) * 100;
+
+        progressBar.style.width =
+            percent + "%";
+    }
+
+
+    // Explanation লুকানো
+    if (explanation) {
+        explanation.style.display = "none";
+    }
+
+    if (explanationText) {
+        explanationText.innerText = "";
+    }
+
+
+    // Next button লুকানো
+    if (nextButton) {
+        nextButton.style.display = "none";
+    }
+
+
+    // Options
+    if (optionsBox) {
+
+        optionsBox.innerHTML = "";
+
+        q.options.forEach(function(option, index) {
+
+            const button =
+                document.createElement("button");
+
+            button.className =
+                "option-btn";
+
+            button.innerText =
+                option;
+
+            button.onclick = function() {
+
+                checkAnswer(index);
+            };
+
+            optionsBox.appendChild(button);
+
+        });
+    }
 }
 
+
+// ----------------------------------------
 // উত্তর যাচাই
+// ----------------------------------------
 function checkAnswer(selectedAnswer) {
 
-  const question = currentQuestions[currentIndex];
+    const q =
+        currentQuestions[currentIndex];
 
-  if (!question) return;
+    if (!q) return;
 
-  const buttons =
-    document.querySelectorAll(".option-btn");
 
-  buttons.forEach(button => {
-    button.disabled = true;
-  });
+    const buttons =
+        document.querySelectorAll(".option-btn");
 
-  if (selectedAnswer === question.answer) {
-    score++;
-  }
 
-  setTimeout(function () {
+    // সব button বন্ধ
+    buttons.forEach(function(button) {
+
+        button.disabled = true;
+
+    });
+
+
+    // সঠিক উত্তর
+    if (selectedAnswer === Number(q.answer)) {
+
+        score++;
+
+    } else {
+
+        wrong++;
+
+    }
+
+
+    // সঠিক/ভুল দেখানো
+    buttons.forEach(function(button, index) {
+
+        if (index === Number(q.answer)) {
+
+            button.style.border =
+                "3px solid green";
+
+        }
+
+        if (
+            index === selectedAnswer &&
+            selectedAnswer !== Number(q.answer)
+        ) {
+
+            button.style.border =
+                "3px solid red";
+
+        }
+
+    });
+
+
+    // Explanation
+    const explanation =
+        document.getElementById("explanation");
+
+    const explanationText =
+        document.getElementById("explanationText");
+
+    if (explanation && explanationText) {
+
+        explanation.style.display =
+            "block";
+
+        explanationText.innerText =
+            selectedAnswer === Number(q.answer)
+                ? "✅ সঠিক উত্তর!"
+                : "❌ ভুল উত্তর। সঠিক উত্তর: " +
+                  q.options[q.answer];
+
+    }
+
+
+    // Next button
+    const nextButton =
+        document.getElementById("nextButton");
+
+    if (nextButton) {
+
+        nextButton.style.display =
+            "block";
+    }
+}
+
+
+// ----------------------------------------
+// পরের প্রশ্ন
+// ----------------------------------------
+function nextQuestion() {
 
     currentIndex++;
 
-    if (currentIndex < totalQuestions) {
-      showQuestion();
-    } else {
-      finishQuiz();
-    }
+    if (
+        currentIndex <
+        currentQuestions.length
+    ) {
 
-  }, 500);
+        showQuestion();
+
+    } else {
+
+        finishQuiz();
+
+    }
 }
 
+
+// ----------------------------------------
 // Quiz শেষ
+// ----------------------------------------
 function finishQuiz() {
 
-  const questionBox =
-    document.getElementById("question") ||
-    document.getElementById("questionText");
+    const quizArea =
+        document.getElementById("quizArea");
 
-  const optionsBox =
-    document.getElementById("options") ||
-    document.getElementById("optionsContainer");
+    const resultArea =
+        document.getElementById("resultArea");
 
-  if (questionBox) {
-    questionBox.innerHTML =
-      "🎉 কুইজ শেষ!";
-  }
+    const correctCount =
+        document.getElementById("correctCount");
 
-  if (optionsBox) {
+    const wrongCount =
+        document.getElementById("wrongCount");
 
-    const percentage =
-      Math.round((score / totalQuestions) * 100);
+    const resultText =
+        document.getElementById("resultText");
 
-    optionsBox.innerHTML = `
-      <div class="result-box">
-        <h2>ফলাফল</h2>
+    const progressBar =
+        document.getElementById("progressBar");
 
-        <p>
-          মোট প্রশ্ন:
-          <strong>${totalQuestions}</strong>
-        </p>
 
-        <p>
-          সঠিক উত্তর:
-          <strong>${score}</strong>
-        </p>
+    if (quizArea) {
 
-        <p>
-          ভুল উত্তর:
-          <strong>${totalQuestions - score}</strong>
-        </p>
+        quizArea.style.display =
+            "none";
+    }
 
-        <p>
-          নম্বর:
-          <strong>${percentage}%</strong>
-        </p>
 
-        <button class="restart-btn" onclick="location.reload()">
-          🔄 আবার শুরু করুন
-        </button>
-      </div>
-    `;
-  }
+    if (resultArea) {
+
+        resultArea.style.display =
+            "block";
+    }
+
+
+    if (correctCount) {
+
+        correctCount.innerText =
+            score;
+    }
+
+
+    if (wrongCount) {
+
+        wrongCount.innerText =
+            wrong;
+    }
+
+
+    if (resultText) {
+
+        const percentage =
+            Math.round(
+                (score / totalQuestions) * 100
+            );
+
+        resultText.innerText =
+            "তোমার স্কোর: " +
+            score +
+            " / " +
+            totalQuestions +
+            " (" +
+            percentage +
+            "%)";
+    }
+
+
+    if (progressBar) {
+
+        progressBar.style.width =
+            "100%";
+    }
 }
 
-// Subject নির্বাচন
-function selectSubject(subject) {
 
-  selectedSubject = subject;
+// ----------------------------------------
+// আবার Quiz
+// ----------------------------------------
+function restartQuiz() {
 
-  const amountBox =
-    document.getElementById("amountBox");
+    const resultArea =
+        document.getElementById("resultArea");
 
-  if (amountBox) {
-    amountBox.style.display = "block";
-  }
+    if (resultArea) {
+
+        resultArea.style.display =
+            "none";
+    }
+
+    startQuiz(totalQuestions);
 }
 
-// 10 / 20 / 30 / 40 / 50 / 60 প্রশ্ন নির্বাচন
-function chooseQuestions(amount) {
 
-  if (!selectedSubject) {
-    alert("আগে একটি Subject নির্বাচন করুন।");
-    return;
-  }
+// ----------------------------------------
+// Robo Teacher
+// ----------------------------------------
+function askTeacher() {
 
-  startQuiz(selectedSubject, amount);
+    const input =
+        document.getElementById("studentQuestion");
+
+    const answerBox =
+        document.getElementById("teacherAnswer");
+
+    const answerText =
+        document.getElementById("teacherAnswerText");
+
+    if (!input) return;
+
+    const question =
+        input.value.trim();
+
+    if (!question) {
+
+        alert("আগে একটি প্রশ্ন লিখুন।");
+
+        return;
+    }
+
+
+    let answer =
+        "আমি Robo Teacher। তোমার প্রশ্নটি বুঝে উত্তর দেওয়ার চেষ্টা করছি।";
+
+
+    if (
+        question.includes("HTML") ||
+        question.includes("html")
+    ) {
+
+        answer =
+            "HTML হলো ওয়েব পেজ তৈরির মূল কাঠামোর ভাষা।";
+
+    } else if (
+        question.includes("CSS") ||
+        question.includes("css")
+    ) {
+
+        answer =
+            "CSS ওয়েব পেজের ডিজাইন ও সাজসজ্জা নিয়ন্ত্রণ করে।";
+
+    } else if (
+        question.includes("বাংলা")
+    ) {
+
+        answer =
+            "বাংলা আমাদের মাতৃভাষা।";
+
+    } else if (
+        question.includes("গণিত")
+    ) {
+
+        answer =
+            "গণিত হলো সংখ্যা, পরিমাণ, আকৃতি ও সম্পর্ক নিয়ে অধ্যয়ন।";
+    }
+
+
+    if (answerText) {
+
+        answerText.innerText =
+            answer;
+    }
+
+
+    if (answerBox) {
+
+        answerBox.style.display =
+            "block";
+    }
 }
 
-// Page load
-document.addEventListener("DOMContentLoaded", function () {
 
-  console.log("AI School Quiz loaded successfully.");
+// ----------------------------------------
+// Voice
+// ----------------------------------------
+function speakText() {
 
-});
+    const answerText =
+        document.getElementById(
+            "teacherAnswerText"
+        );
+
+    if (!answerText) return;
+
+    const text =
+        answerText.innerText;
+
+    if (!text) return;
+
+    if (
+        "speechSynthesis" in window
+    ) {
+
+        window.speechSynthesis.cancel();
+
+        const speech =
+            new SpeechSynthesisUtterance(text);
+
+        speech.lang = "bn-BD";
+
+        speech.rate = 0.9;
+
+        speech.pitch = 1;
+
+        speech.volume = 1;
+
+        window.speechSynthesis.speak(
+            speech
+        );
+
+    } else {
+
+        alert(
+            "এই ফোনে Voice সুবিধা পাওয়া যায়নি।"
+        );
+    }
+}
+
+
+// ----------------------------------------
+// Page Ready
+// ----------------------------------------
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        console.log(
+            "AI Robo Teacher Ready!"
+        );
+
+    }
+);

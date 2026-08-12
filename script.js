@@ -546,7 +546,7 @@ function speakText(text) {
     setTimeout(function () {
         synth.speak(speech);
     }, 100);
-}------------------------------------------/ Page Ready
+}------------------------------------------ / Page Ready
 // ----------------------------------------
 document.addEventListener(
     "DOMContentLoaded",

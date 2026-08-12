@@ -511,42 +511,52 @@ function askTeacher() {
 // ----------------------------------------
 // Voice
 // ----------------------------------------
-function speakText(text) {
-    if (!text || !text.trim()) {
-        alert("কোনো উত্তর পাওয়া যায়নি।");
-        return;
+function speakText() {
+
+    const answerText =
+        document.getElementById(
+            "teacherAnswerText"
+        );
+
+    if (!answerText) return;
+
+    const text =
+        answerText.innerText;
+
+    if (!text) return;
+
+    if (
+        "speechSynthesis" in window
+    ) {
+
+        window.speechSynthesis.cancel();
+
+        const speech =
+            new SpeechSynthesisUtterance(text);
+
+        speech.lang = "bn-BD";
+
+        speech.rate = 0.9;
+
+        speech.pitch = 1;
+
+        speech.volume = 1;
+
+        window.speechSynthesis.speak(
+            speech
+        );
+
+    } else {
+
+        alert(
+            "এই ফোনে Voice সুবিধা পাওয়া যায়নি।"
+        );
     }
+}
 
-    if (!("speechSynthesis" in window)) {
-        alert("এই ফোন/ব্রাউজারে Voice সুবিধা নেই।");
-        return;
-    }
 
-    const synth = window.speechSynthesis;
-
-    synth.cancel();
-
-    const speech = new SpeechSynthesisUtterance(text);
-
-    speech.lang = "bn-BD";
-    speech.rate = 0.9;
-    speech.pitch = 1;
-    speech.volume = 1;
-
-    const voices = synth.getVoices();
-
-    const banglaVoice = voices.find(v =>
-        v.lang && v.lang.toLowerCase().startsWith("bn")
-    );
-
-    if (banglaVoice) {
-        speech.voice = banglaVoice;
-    }
-
-    setTimeout(function () {
-        synth.speak(speech);
-    }, 100);
-}------------------------------------------ / Page Ready
+// ----------------------------------------
+// Page Ready
 // ----------------------------------------
 document.addEventListener(
     "DOMContentLoaded",
